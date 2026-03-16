@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎪 Аукціон психологічного благополуччя</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            padding: 20px;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .stats-bar {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 10px 20px;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .coins {
+            color: #f39c12 !important;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 20px;
+        }
+
+        @media (max-width: 900px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .auction-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .category {
+            margin-bottom: 30px;
+            border: 2px solid #f0f0f0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .category-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 20px;
+            font-size: 1.3em;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .lots-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+            padding: 20px;
+        }
+
+        .lot-card {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 15px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .lot-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border-color: #667eea;
+        }
+
+        .lot-card.sold {
+            opacity: 0.5;
+            pointer-events: none;
+            background: #e9ecef;
+        }
+
+        .lot-card.sold::after {
+            content: "ПРОДАНО";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            background: #e74c3c;
+            color: white;
+            padding: 10px 30px;
+            font-weight: bold;
+            font-size: 1.2em;
+            border-radius: 5px;
+            z-index: 10;
+        }
+
+        .lot-name {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #2c3e50;
+            font-size: 1.05em;
+        }
+
+        .lot-price {
+            color: #f39c12;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .bid-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .bid-input {
+            width: 80px;
+            padding: 8px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 1em;
+            text-align: center;
+        }
+
+        .bid-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 0.95em;
+        }
+
+        .btn-buy {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-buy:hover:not(:disabled) {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-buy:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+        }
+
+        .cart-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+
+        .cart-title {
+            font-size: 1.5em;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .cart-items {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .cart-item {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .cart-item-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 0.95em;
+        }
+
+        .cart-item-price {
+            color: #f39c12;
+            font-weight: bold;
+        }
+
+        .cart-empty {
+            text-align: center;
+            color: #95a5a6;
+            padding: 30px;
+            font-style: italic;
+        }
+
+        .cart-total {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 2px solid #e9ecef;
+            font-size: 1.2em;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            max-width: 500px;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal h2 {
+            color: #27ae60;
+            margin-bottom: 20px;
+            font-size: 2em;
+        }
+
+        .modal p {
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        .btn-close {
+            background: #667eea;
+            color: white;
+            margin-top: 20px;
+            padding: 12px 30px;
+            font-size: 1.1em;
+        }
+
+        .btn-reset {
+            background: #e74c3c;
+            color: white;
+            margin-top: 20px;
+            padding: 12px 30px;
+            font-size: 1.1em;
+        }
+
+        .reflection {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .reflection h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .reflection ul {
+            margin-left: 20px;
+        }
+
+        .reflection li {
+            margin-bottom: 8px;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #27ae60;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            display: none;
+            animation: slideInRight 0.3s ease;
+            z-index: 1001;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(400px);
+            }
+            to {
+                transform: translateX(0);
+            }
+        }
+
+        .error {
+            background: #e74c3c !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎪 Аукціон психологічного благополуччя</h1>
+            <p>Інвестуйте у своє здоров'я та щастя!</p>
+        </header>
+
+        <div class="stats-bar">
+            <div class="stat-item">
+                <div class="stat-label">💰 Ваш баланс</div>
+                <div class="stat-value coins" id="coins">10 🪙</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">🛒 Лотів у кошику</div>
+                <div class="stat-value" id="cartCount">0</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">💵 Витрачено</div>
+                <div class="stat-value" id="spent">0 🪙</div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="auction-section">
+                <div id="categoriesContainer"></div>
+            </div>
+
+            <div class="cart-section">
+                <div class="cart-title">🛒 Ваш кошик</div>
+                <div class="cart-items" id="cartItems">
+                    <div class="cart-empty">Кошик порожній<br>Обирайте лоти!</div>
+                </div>
+                <div class="cart-total">
+                    <span>Всього:</span>
+                    <span id="totalSpent">0 🪙</span>
+                </div>
+                <button class="btn btn-reset" onclick="showFinishModal()" style="width: 100%; margin-top: 15px;">
+                    Завершити аукціон
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="notification" id="notification"></div>
+
+    <div class="modal" id="finishModal">
+        <div class="modal-content">
+            <h2>🎉 Аукціон завершено!</h2>
+            <div id="finalResults"></div>
+            <div class="reflection">
+                <h3>💭 Запитання для рефлексії:</h3>
+                <ul>
+                    <li>Які лоти ви обрали і чому вони важливі?</li>
+                    <li>Від чого відмовилися і чи було це важко?</li>
+                    <li>Як можете реалізувати хоча б один лот цього тижня?</li>
+                </ul>
+            </div>
+            <p style="margin-top: 20px; font-style: italic; color: #666;">
+                💡 Пам'ятайте: благополуччя — це щоденна практика турботи про себе 🌱
+            </p>
+            <button class="btn btn-close" onclick="closeModal()">Закрити</button>
+            <button class="btn btn-reset" onclick="resetGame()">Почати знову</button>
+        </div>
+    </div>
+
+    <script>
+        const lotsData = {
+            "1": {
+                category: "💤 Фізичне відновлення",
+                items: [
+                    { id: "1a", name: "8 годин якісного сну (без пробуджень та тривог)", basePrice: 3 },
+                    { id: "1b", name: "Година професійного масажу або повне м'язове розслаблення", basePrice: 4 },
+                    { id: "1c", name: "Смачна та корисна вечеря, яку приготував хтось інший", basePrice: 2 },
+                    { id: "1d", name: "Відсутність ранкового будильника протягом трьох днів", basePrice: 3 }
+                ]
+            },
+            "2": {
+                category: "📵 Інформаційний детокс",
+                items: [
+                    { id: "2a", name: "День без новин та тривожних повідомлень у месенджерах", basePrice: 3 },
+                    { id: "2b", name: "«Цифрова тиша»: вечір без перевірки зошитів та робочих чатів", basePrice: 2 },
+                    { id: "2c", name: "Три години абсолютної тиші (коли ніхто не звертається на ім'я)", basePrice: 4 }
+                ]
+            },
+            "3": {
+                category: "❤️ Емоційна близькість та визнання",
+                items: [
+                    { id: "3a", name: "Щира розмова з близькою людиною, яка просто слухає і розуміє", basePrice: 3 },
+                    { id: "3b", name: "Подяка від учнів або колег (не за протоколом, а від серця)", basePrice: 2 },
+                    { id: "3c", name: "Вечір у колі друзів, де заборонено говорити про роботу", basePrice: 3 },
+                    { id: "3d", name: "Обійми, які тривають стільки, скільки вам потрібно", basePrice: 2 }
+                ]
+            },
+            "4": {
+                category: "🌿 Простір та час",
+                items: [
+                    { id: "4a", name: "Вихідний без жодних обов'язків (навіть домашніх)", basePrice: 4 },
+                    { id: "4b", name: "Відпустка на природі (ліс, гори або берег річки)", basePrice: 5 },
+                    { id: "4c", name: "Час тільки для себе (зайнятися тим, що ви відкладали місяцями)", basePrice: 3 },
+                    { id: "4d", name: "Прогулянка на самоті гарним парком без поспіху", basePrice: 2 }
+                ]
+            },
+            "5": {
+                category: "🎨 Творчість та натхнення",
+                items: [
+                    { id: "5a", name: "Квиток на захід, який надихає (театр, концерт, виставка)", basePrice: 3 },
+                    { id: "5b", name: "Можливість зайнятися хобі протягом цілого дня (малювання, квіти, кулінарія)", basePrice: 3 },
+                    { id: "5c", name: "Перегляд улюбленого фільму з великою порцією попкорну або чаю", basePrice: 2 }
+                ]
+            }
+        };
+
+        let coins = 10;
+        let cart = [];
+        let soldLots = [];
+
+        function init() {
+            renderCategories();
+            updateStats();
+        }
+
+        function renderCategories() {
+            const container = document.getElementById('categoriesContainer');
+            container.innerHTML = '';
+
+            for (const [key, data] of Object.entries(lotsData)) {
+                const categoryDiv = document.createElement('div');
+                categoryDiv.className = 'category';
+                
+                const header = document.createElement('div');
+                header.className = 'category-header';
+                header.textContent = data.category;
+                
+                const grid = document.createElement('div');
+                grid.className = 'lots-grid';
+                
+                data.items.forEach(lot => {
+                    const isSold = soldLots.includes(lot.id);
+                    const lotCard = createLotCard(lot, isSold);
+                    grid.appendChild(lotCard);
+                });
+                
+                categoryDiv.appendChild(header);
+                categoryDiv.appendChild(grid);
+                container.appendChild(categoryDiv);
+            }
+        }
+
+        function createLotCard(lot, isSold) {
+            const card = document.createElement('div');
+            card.className = `lot-card ${isSold ? 'sold' : ''}`;
+            card.id = `lot-${lot.id}`;
+            
+            const name = document.createElement('div');
+            name.className = 'lot-name';
+            name.textContent = lot.name;
+            
+            const price = document.createElement('div');
+            price.className = 'lot-price';
+            price.textContent = `💰 Стартова ціна: ${lot.basePrice} 🪙`;
+            
+            const controls = document.createElement('div');
+            controls.className = 'bid-controls';
+            
+            if (!isSold) {
+                const input = document.createElement('input');
+                input.type = 'number';
+                input.className = 'bid-input';
+                input.min = lot.basePrice;
+                input.max = coins;
+                input.value = lot.basePrice;
+                input.id = `bid-${lot.id}`;
+                
+                const btn = document.createElement('button');
+                btn.className = 'btn btn-buy';
+                btn.textContent = 'Купити';
+                btn.onclick = () => buyLot(lot);
+                btn.disabled = coins < lot.basePrice;
+                
+                controls.appendChild(input);
+                controls.appendChild(btn);
+            } else {
+                const soldText = document.createElement('div');
+                soldText.style.color = '#e74c3c';
+                soldText.style.fontWeight = 'bold';
+                soldText.textContent = '✓ Продано';
+                controls.appendChild(soldText);
+            }
+            
+            card.appendChild(name);
+            card.appendChild(price);
+            card.appendChild(controls);
+            
+            return card;
+        }
+
+        function buyLot(lot) {
+            const input = document.getElementById(`bid-${lot.id}`);
+            const bid = parseInt(input.value);
+            
+            if (isNaN(bid) || bid < lot.basePrice) {
+                showNotification(`Мінімальна ставка: ${lot.basePrice} 🪙`, true);
+                return;
+            }
+            
+            if (bid > coins) {
+                showNotification(`Недостатньо монет! У вас: ${coins} 🪙`, true);
+                return;
+            }
+            
+            coins -= bid;
+            cart.push({ ...lot, price: bid });
+            soldLots.push(lot.id);
+            
+            showNotification(`🎉 Придбано: ${lot.name} за ${bid} 🪙`);
+            
+            renderCategories();
+            updateStats();
+            renderCart();
+        }
+
+        function updateStats() {
+            document.getElementById('coins').textContent = `${coins} 🪙`;
+            document.getElementById('cartCount').textContent = cart.length;
+            const spent = 10 - coins;
+            document.getElementById('spent').textContent = `${spent} 🪙`;
+            document.getElementById('totalSpent').textContent = `${spent} 🪙`;
+        }
+
+        function renderCart() {
+            const container = document.getElementById('cartItems');
+            
+            if (cart.length === 0) {
+                container.innerHTML = '<div class="cart-empty">Кошик порожній<br>Обирайте лоти!</div>';
+                return;
+            }
+            
+            container.innerHTML = '';
+            cart.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = 'cart-item';
+                div.innerHTML = `
+                    <div class="cart-item-name">${index + 1}. ${item.name}</div>
+                    <div class="cart-item-price">${item.price} 🪙</div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function showNotification(message, isError = false) {
+            const notif = document.getElementById('notification');
+            notif.textContent = message;
+            notif.className = `notification ${isError ? 'error' : ''}`;
+            notif.style.display = 'block';
+            
+            setTimeout(() => {
+                notif.style.display = 'none';
+            }, 3000);
+        }
+
+        function showFinishModal() {
+            const modal = document.getElementById('finishModal');
+            const results = document.getElementById('finalResults');
+            
+            if (cart.length === 0) {
+                results.innerHTML = `
+                    <p>Ви не придбали жодного лота.</p>
+                    <p style="color: #e74c3c;">💭 Що заважає вам інвестувати у своє благополуччя?</p>
+                `;
+            } else {
+                let html = '<p>Ваші інвестиції у благополуччя:</p><ul style="text-align: left; margin: 20px auto; max-width: 300px;">';
+                cart.forEach(item => {
+                    html += `<li style="margin: 10px 0;">✨ ${item.name} <strong>(${item.price} 🪙)</strong></li>`;
+                });
+                html += '</ul>';
+                html += `<p style="color: #27ae60; font-weight: bold;">Залишок: ${coins} 🪙</p>`;
+                results.innerHTML = html;
+            }
+            
+            modal.style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('finishModal').style.display = 'none';
+        }
+
+        function resetGame() {
+            coins = 10;
+            cart = [];
+            soldLots = [];
+            closeModal();
+            renderCategories();
+            updateStats();
+            renderCart();
+            showNotification('Гру розпочато знову! 🎪');
+        }
+
+        // Close modal on outside click
+        window.onclick = function(event) {
+            const modal = document.getElementById('finishModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+
+        // Initialize game
+        init();
+    </script>
+</body>
+</html>
